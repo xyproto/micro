@@ -209,7 +209,7 @@ func (v *View) paste(clip string) {
 		v.Cursor.DeleteSelection()
 		v.Cursor.ResetSelection()
 	}
-	
+
 	v.Buf.Insert(v.Cursor.Loc, clip)
 	// v.Cursor.Loc = v.Cursor.Loc.Move(Count(clip), v.Buf)
 	v.freshClip = false
@@ -844,10 +844,12 @@ func (v *View) DisplayView() {
 
 	v.cellview.Draw(v.Buf, top, height, left, width-v.lineNumOffset)
 
-	screenX := v.x
 	realLineN := top - 1
 	visualLineN := 0
-	var line []*Char
+	var (
+		line    []*Char
+		screenX int
+	)
 	for visualLineN, line = range v.cellview.lines {
 		var firstChar *Char
 		if len(line) > 0 {
@@ -956,11 +958,13 @@ func (v *View) DisplayView() {
 
 			// Write the extra space
 			screen.SetContent(screenX+divider, yOffset+visualLineN, ' ', nil, lineNumStyle)
-			screenX++
+			//screenX++
 		}
 
-		var lastChar *Char
-		cursorSet := false
+		var (
+			lastChar  *Char
+			cursorSet bool
+		)
 		for _, char := range line {
 			if char != nil {
 				lineStyle := char.style
@@ -1011,10 +1015,13 @@ func (v *View) DisplayView() {
 			}
 		}
 
-		lastX := 0
-		var realLoc Loc
-		var visualLoc Loc
-		var cx, cy int
+		var (
+			lastX     int
+			realLoc   Loc
+			visualLoc Loc
+			cx        int
+			cy        int
+		)
 		if lastChar != nil {
 			lastX = xOffset + lastChar.visualLoc.X + lastChar.width
 			for i, c := range v.Buf.cursors {
